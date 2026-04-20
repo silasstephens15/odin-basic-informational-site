@@ -2,19 +2,32 @@ const http = require("node:http");
 const fs = require("fs");
 
 function getFileData(url) {
-  const file = "./src/pages/" + (url = "/" ? "/index" : url).slice(1) + ".html";
+  const file =
+    "./src/pages/" + (url == "/" ? "/index" : url).slice(1) + ".html";
+  console.log(url);
   try {
     var data = fs.readFileSync(file, "utf8");
   } catch (err) {
     console.log(err);
-    console.log(url);
+    if (err.code == "ENOENT") {
+      throw new Error("File not found.");
+    }
   }
   return data;
 }
 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(getFileData(req.url));
+  try {
+    var data = getFileData(req.url);
+    res.writeHead(200, { "Content-Type": "text/html" });
+  } catch (err) {
+    res.writeHead(404, { "Content-Type": "text/html" });
+    console.log(err);
+    if ((err = "File not found.")) {
+      var data = getFileData("/404");
+    }
+  }
+  res.end(data);
 });
 
 server.listen(8080);
