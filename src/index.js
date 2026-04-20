@@ -4,7 +4,6 @@ const fs = require("fs");
 function getFileData(url) {
   const file =
     "./src/pages/" + (url == "/" ? "/index" : url).slice(1) + ".html";
-  console.log(url);
   try {
     var data = fs.readFileSync(file, "utf8");
   } catch (err) {
